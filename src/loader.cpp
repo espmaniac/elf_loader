@@ -62,9 +62,9 @@ void ElfLoader::parse() {
 int16_t ElfLoader::relocate() {
     for (uint32_t i = 1; i < header->e_shnum; ++i) {
         Elf32_Shdr *section = ((Elf32_Shdr*) (payload + header->e_shoff) + i);
-        //if (it->second == nullptr) continue;
         Elf32_Shdr *strtab = ((Elf32_Shdr*) (payload + header->e_shoff) + section->sh_link);
         Elf32_Shdr *symtab = ((Elf32_Shdr*) (payload + header->e_shoff) + strtab->sh_link);
+        
         void *data = sections_data.find(section->sh_info)->second;
         if (data == nullptr) continue;
         if (section->sh_entsize <= 0) continue;
