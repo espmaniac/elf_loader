@@ -3,27 +3,27 @@
 ElfLoader::ElfLoader() : header(nullptr), payload(nullptr), entry_point(nullptr) {}
 
 ElfLoader::ElfLoader(void* payloadFile) : ElfLoader() {
-    this->payload = payloadFile;
-    this->parse();
+    payload = payloadFile;
+    parse();
     
     if (relocate() == 0)
-        ((void (*) ()) header->e_entry)();
+        ((void (*) ()) entry_point)();
 }
 
 ElfLoader::ElfLoader(void* payloadFile, std::vector<ELFLoaderSymbol_t> exportedThings) : ElfLoader() {
-    this->payload = payloadFile;
-    this->parse();
-    this->exports = exportedThings;
+    payload = payloadFile;
+    parse();
+    exports = exportedThings;
     if(relocate() == 0)
         ((void (*) ()) entry_point)();
 }
 
 void ElfLoader::setPayload(void *payloadFile) {
-    this->payload = payloadFile;
+    payload = payloadFile;
 }
 
 void ElfLoader::setExports(std::vector<ELFLoaderSymbol_t> exportedThings) {
-    this->exports = exportedThings;
+    exports = exportedThings;
 }
 
 void ElfLoader::parse() {
@@ -37,7 +37,7 @@ void ElfLoader::parse() {
                 void *data = nullptr;
                 if (sectHdr->sh_flags & SHF_EXECINSTR) {
                     data = heap_caps_malloc(sectHdr->sh_size, MALLOC_CAP_EXEC | MALLOC_CAP_32BIT);
-                    this->entry_point = (void*)(data + header->e_entry); 
+                    entry_point = (void*)(data + header->e_entry); 
                 }
                 else 
                     data = heap_caps_malloc(sectHdr->sh_size, MALLOC_CAP_8BIT);
