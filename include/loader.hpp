@@ -9,8 +9,6 @@
 #include <utility>
 #include <vector>
 
-
-
 struct ELFLoaderSymbol_t {
     const char *name;
     void *ptr;
@@ -29,7 +27,7 @@ public:
 
     ~ElfLoader();
 private:
-    int16_t relocateSymbol(Elf32_Addr relAddr, int32_t type, Elf32_Addr symAddr);
+    int16_t relocateSymbol(Elf32_Addr, int32_t, Elf32_Addr);
 
     uint8_t unalignedGet8(void*);
     void unalignedSet8(void*, uint8_t);
