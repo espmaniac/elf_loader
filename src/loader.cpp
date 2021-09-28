@@ -29,9 +29,10 @@ void ElfLoader::setExports(std::vector<ELFLoaderSymbol_t> exportedThings) {
 void ElfLoader::parse() {
     header = ((Elf32_Ehdr*) payload);
     if (memcmp(header->e_ident + 1, "ELF", 3) != 0) return;
-
+    //Elf32_Shdr *shstrtab = ((Elf32_Shdr*) (payload + header->e_shoff) + header->e_shstrndx);
     for (uint32_t i = 1; i < header->e_shnum; ++i) {
-        Elf32_Shdr *sectHdr = &*((Elf32_Shdr*)(payload + header->e_shoff) + i);
+        Elf32_Shdr *sectHdr = ((Elf32_Shdr*)(payload + header->e_shoff) + i);
+        //const char* name = (const char*)(payload + sectHdr->sh_name + shstrtab->sh_offset);
         if (sectHdr->sh_flags & SHF_ALLOC) {
             if (sectHdr->sh_size) {
                 void *data = nullptr;
@@ -54,11 +55,8 @@ void ElfLoader::parse() {
                 
                 sections_data.insert(std::pair<int32_t, void*>(i, data));
             }
-        }
-        
-        
+        }   
     }
-
 }
 
 int16_t ElfLoader::relocate() {
