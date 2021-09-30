@@ -128,4 +128,8 @@ std::vector<ELFLoaderSymbol_t> exp = {
 
 extern "C" void app_main() {
   ElfLoader test((void*)elfFile, exp);
+  test.parse();
+  test.relocate();
+  ((void (*) ())test.getEntryPoint())();
+  test.elfLoaderFree();
 }
