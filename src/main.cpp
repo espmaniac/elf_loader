@@ -131,5 +131,4 @@ extern "C" void app_main() {
   test.parse();
   test.relocate();
   ((void (*) ())test.getEntryPoint())();
-  test.elfLoaderFree();
 }
