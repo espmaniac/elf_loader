@@ -4,22 +4,19 @@ ElfLoader::ElfLoader() : header(nullptr), payload(nullptr), entry_point(nullptr)
 
 ElfLoader::ElfLoader(void* payloadFile) : ElfLoader() {
     payload = payloadFile;
-    parse();
-    
-    if (relocate() == 0)
-        ((void (*) ()) entry_point)();
 }
 
 ElfLoader::ElfLoader(void* payloadFile, std::vector<ELFLoaderSymbol_t> exportedThings) : ElfLoader() {
     payload = payloadFile;
-    parse();
     exports = exportedThings;
-    if(relocate() == 0)
-        ((void (*) ()) entry_point)();
 }
 
 void ElfLoader::setPayload(void *payloadFile) {
     payload = payloadFile;
+}
+
+void* ElfLoader::getEntryPoint() const {
+    return entry_point;
 }
 
 void ElfLoader::setExports(std::vector<ELFLoaderSymbol_t> exportedThings) {
