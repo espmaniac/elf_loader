@@ -62,23 +62,23 @@ void ElfLoader::parse() {
 int16_t ElfLoader::relocate() {
     for (uint32_t i = 1; i < header->e_shnum; ++i) {
         Elf32_Shdr *section = ((Elf32_Shdr*) (payload + header->e_shoff) + i);
-        Elf32_Shdr *strtab = ((Elf32_Shdr*) (payload + header->e_shoff) + section->sh_link);
-        Elf32_Shdr *symtab = ((Elf32_Shdr*) (payload + header->e_shoff) + strtab->sh_link);
-        
+        Elf32_Shdr *symtab = ((Elf32_Shdr*) (payload + header->e_shoff) + section->sh_link);
+        Elf32_Shdr *strtab = ((Elf32_Shdr*) (payload + header->e_shoff) + symtab->sh_link);
+
         void *data = sections_data.find(section->sh_info)->second;
         if (data == nullptr) continue;
         if (section->sh_entsize <= 0) continue;
         
         for (uint32_t index = 0; index < (section->sh_size / section->sh_entsize); index++) {
             Elf32_Rela *rel = ((Elf32_Rela*) (payload + section->sh_offset) + index);
-            Elf32_Sym *sym = ((Elf32_Sym*) (payload + strtab->sh_offset) + ELF32_R_SYM(rel->r_info));
-            const char* name = (const char*) (payload + sym->st_name + symtab->sh_offset);
+            Elf32_Sym *sym = ((Elf32_Sym*) (payload + symtab->sh_offset) + ELF32_R_SYM(rel->r_info));
+            const char* name = (const char*) (payload + sym->st_name + strtab->sh_offset);
             Elf32_Addr relAddr = ((Elf32_Addr) data) + rel->r_offset;
             Elf32_Addr symAddr = rel->r_addend;
-            void* __symAddr = sections_data.find(sym->st_shndx)->second;
+            void* relSectionData = sections_data.find(sym->st_shndx)->second;
 
-            if (__symAddr)
-                symAddr += ((Elf32_Addr)__symAddr) + sym->st_value;
+            if (relSectionData)
+                symAddr += ((Elf32_Addr)relSectionData) + sym->st_value;
             else 
                 for (auto &elfLoaderSymbol : exports) 
                     if (strcmp(elfLoaderSymbol.name, name) == 0) {
