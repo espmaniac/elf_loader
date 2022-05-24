@@ -24,10 +24,10 @@ public:
     void setExports(std::vector<ELFLoaderSymbol_t>);
     void parse();
     int16_t relocate();
-    void elfLoaderFree();
 
     ~ElfLoader();
 private:
+    void elfLoaderFree();
     int16_t relocateSymbol(Elf32_Addr, int32_t, Elf32_Addr);
 
     uint8_t unalignedGet8(void*);
