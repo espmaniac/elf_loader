@@ -121,13 +121,11 @@ uint8_t elfFile[] = {
   0x00, 0x00, 0x00, 0x00
 };
 
-std::vector<ELFLoaderSymbol_t> exp = {
-  {"puts", (void*) puts},
-  { "printf", (void*) printf }
-};
-
 extern "C" void app_main() {
-  ElfLoader test((void*)elfFile, exp);
+  ElfLoader test((void*)elfFile, {
+    {"puts", (void*) puts},
+    { "printf", (void*) printf }
+  });
   test.parse();
   test.relocate();
   ((void (*) ())test.getEntryPoint())();

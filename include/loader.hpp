@@ -18,10 +18,10 @@ class ElfLoader {
 public:
     ElfLoader();
     ElfLoader(void*);
-    ElfLoader(void*, std::vector<ELFLoaderSymbol_t>);
+    ElfLoader(void*, const std::vector<ELFLoaderSymbol_t>&);
     void setPayload(void*);
     void* getEntryPoint() const;
-    void setExports(std::vector<ELFLoaderSymbol_t>);
+    void setExports(const std::vector<ELFLoaderSymbol_t>&);
     void parse();
     int16_t relocate();
 

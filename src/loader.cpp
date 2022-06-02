@@ -1,12 +1,12 @@
 #include "loader.hpp"
 
-ElfLoader::ElfLoader() : header(nullptr), payload(nullptr), entry_point(nullptr) {}
+ElfLoader::ElfLoader() : header(nullptr), payload(nullptr), entry_point(nullptr), exports{0} {}
 
 ElfLoader::ElfLoader(void* payloadFile) : ElfLoader() {
     payload = payloadFile;
 }
 
-ElfLoader::ElfLoader(void* payloadFile, std::vector<ELFLoaderSymbol_t> exportedThings) : ElfLoader() {
+ElfLoader::ElfLoader(void *payloadFile, const std::vector<ELFLoaderSymbol_t> &exportedThings) : ElfLoader() {
     payload = payloadFile;
     exports = exportedThings;
 }
@@ -19,7 +19,7 @@ void* ElfLoader::getEntryPoint() const {
     return entry_point;
 }
 
-void ElfLoader::setExports(std::vector<ELFLoaderSymbol_t> exportedThings) {
+void ElfLoader::setExports(const std::vector<ELFLoaderSymbol_t> &exportedThings) {
     exports = exportedThings;
 }
 
@@ -252,7 +252,7 @@ void ElfLoader::unalignedCpy(void* dest, void* src, size_t n) {
 
 ElfLoader::~ElfLoader() {
     elfLoaderFree();
-    exports.clear();
+    //exports.clear();
     sections_data.clear();
     entry_point = nullptr;
     payload = nullptr;
