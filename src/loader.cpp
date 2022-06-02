@@ -252,7 +252,7 @@ void ElfLoader::unalignedCpy(void* dest, void* src, size_t n) {
 
 ElfLoader::~ElfLoader() {
     elfLoaderFree();
-    //exports.clear();
+    exports.clear();
     sections_data.clear();
     entry_point = nullptr;
     payload = nullptr;
