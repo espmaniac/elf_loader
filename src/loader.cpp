@@ -157,7 +157,7 @@ int16_t ElfLoader::relocateSymbol(Elf32_Addr relAddr, int32_t type, Elf32_Addr s
             /* *** Format: BRI8  *** */
             /* *** BALL, BANY, BBC, BBCI, BBCI.L, BBS,  BBSI, BBSI.L, BEQ, BGE,  BGEU, BLT, BLTU, BNALL, BNE,  BNONE, LOOP,  *** */
             /* *** BEQI, BF, BGEI, BGEUI, BLTI, BLTUI, BNEI,  BT, LOOPGTZ, LOOPNEZ *** */
-            if (((v & 0xF) == 7) || ((v & 0x3F) == 26) ||  ((v & 0x3F) == 36 && (v & 0xFF) != 36)) {
+            if (((v & 0xF) == 7) || ((v & 0x3F) == 0x26) ||  ((v & 0x3F) == 0x36 && (v & 0xFF) != 0x36)) {
                 int32_t delta =  symAddr - (relAddr + 4);
                 unalignedSet8((void*)(relAddr + 2), delta & 0xFF);
                 if ((delta < -(1 << 7)) || (delta >= (1 << 7))) // Relocation: BRI8 out of range
@@ -168,7 +168,7 @@ int16_t ElfLoader::relocateSymbol(Elf32_Addr relAddr, int32_t type, Elf32_Addr s
 
             /* *** Format: BRI12 *** */
             /* *** BEQZ, BGEZ, BLTZ, BNEZ *** */
-            if ((v & 0x3F) == 16) {
+            if ((v & 0x3F) == 0x16) {
                 int32_t delta =  (symAddr - (relAddr + 4)) << 4;
                 delta |= unalignedGet32((void*)(relAddr + 1));
                 unalignedSet8((void*)(relAddr + 1), delta & 0xFF);
