@@ -128,8 +128,10 @@ int32_t ElfLoader::relocate() {
 
 void ElfLoader::elfLoaderFree() {
 	for (auto it = sections_data_m.begin(); it != sections_data_m.end(); ++it)
-		if (it->second)
+		if (it->second) {
 			heap_caps_free(it->second);
+			it->second = nullptr;
+		}
 	
 	sections_data_m.clear();
 	exports_m.clear();
