@@ -37,9 +37,9 @@ void ElfLoader::setExports(const std::vector<ELFLoaderSymbol_t> &exportedThings)
 	exports_m = exportedThings;
 }
 
-void ElfLoader::parse() {
+int16_t ElfLoader::parse() {
 	header_m = ((Elf32_Ehdr*) payload_m);
-	if (memcmp(header_m->e_ident + 1, "ELF", 3) != 0) return;
+	if (memcmp(header_m->e_ident + 1, "ELF", 3) != 0) return -1;
 	Elf32_Shdr *shstrtab = ((Elf32_Shdr*) ((uint32_t)payload_m + header_m->e_shoff) + header_m->e_shstrndx);
 
 	for (int32_t i = 1; i < header_m->e_shnum; ++i) {
@@ -58,7 +58,7 @@ void ElfLoader::parse() {
 
 				if (data == nullptr) {
 					elfLoaderFree();
-					return;
+					return -1;
 				}
 				
 				if (sectHdr->sh_type == SHT_NOBITS)
@@ -72,9 +72,10 @@ void ElfLoader::parse() {
 		if (strcmp(name, ".symtab") == 0)
 			symtab_m = sectHdr;
 	}
+	return 0;
 }
 
-int32_t ElfLoader::relocate() {
+int16_t ElfLoader::relocate() {
 	for (int32_t i = 1; i < header_m->e_shnum; ++i) {
 		Elf32_Shdr *section = ((Elf32_Shdr*) ((uint32_t)payload_m + header_m->e_shoff) + i);
 		Elf32_Shdr *symtab = ((Elf32_Shdr*) ((uint32_t)payload_m + header_m->e_shoff) + section->sh_link);
@@ -226,7 +227,7 @@ int16_t ElfLoader::relocateSymbol(Elf32_Addr relAddr, int32_t type, Elf32_Addr s
 				break;
 			}
 
-			return 0;
+			return -1;
 			//break;
 		}
 

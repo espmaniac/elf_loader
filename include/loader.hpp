@@ -23,8 +23,8 @@ public:
 	void *getEntryPoint(const char*);
 	
 	void setExports(const std::vector<ELFLoaderSymbol_t>&);
-	void parse();
-	int32_t relocate();
+	int16_t parse();
+	int16_t relocate();
 
 	~ElfLoader();
 
@@ -38,7 +38,6 @@ private:
 	uint32_t unalignedGet32(void*);
 	void unalignedSet32(void*, uint32_t);
 	void unalignedCpy(void*, void*, size_t);
-
 
 	Elf32_Ehdr *header_m;
 	Elf32_Shdr *symtab_m;
