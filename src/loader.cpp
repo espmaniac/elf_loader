@@ -70,7 +70,7 @@ void ElfLoader::parse() {
 			}
 		}   
 		if (strcmp(name, ".symtab") == 0)
-			symtab_m = ((Elf32_Shdr*)((uint32_t)payload_m + header_m->e_shoff) + i);
+			symtab_m = sectHdr;
 	}
 }
 
