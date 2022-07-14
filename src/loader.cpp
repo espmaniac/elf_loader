@@ -131,6 +131,12 @@ void ElfLoader::elfLoaderFree() {
 		if (it->second)
 			heap_caps_free(it->second);
 	
+	sections_data_m.clear();
+	exports_m.clear();
+	entry_point_m = nullptr;
+	payload_m = nullptr;
+	header_m = nullptr;
+	symtab_m = nullptr;
 }
 
 int16_t ElfLoader::relocateSymbol(Elf32_Addr relAddr, int32_t type, Elf32_Addr symAddr) {
@@ -275,11 +281,5 @@ void ElfLoader::unalignedCpy(void* dest, void* src, size_t n) {
 }
 
 ElfLoader::~ElfLoader() {
-	entry_point_m = nullptr;
-	payload_m = nullptr;
-	header_m = nullptr;
-	symtab_m = nullptr;
 	elfLoaderFree();
-	exports_m.clear();
-	sections_data_m.clear();
 }
