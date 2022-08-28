@@ -6,7 +6,7 @@
 // example
 
 /* compile: 
-xtensa-esp32-elf-gcc file.c -r -nostartfiles -nodefaultlibs -nostdlib -e local_main -falign-functions=16
+xtensa-esp32-elf-gcc file.c -r -nostartfiles -nodefaultlibs -nostdlib -e local_main -falign-functions=4
 */
 
 /* elf file code
