@@ -5,6 +5,10 @@
 
 // example
 
+/* compile: 
+xtensa-esp32-elf-gcc file.c -r -nostartfiles -nodefaultlibs -nostdlib -e local_main -falign-functions=16
+*/
+
 /* elf file code
 #include <stdio.h>
 #include <stdint.h>
