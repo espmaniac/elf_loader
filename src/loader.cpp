@@ -83,7 +83,8 @@ int16_t ElfLoader::relocate() {
 		Elf32_Shdr *symtab = ((Elf32_Shdr*) ((uint32_t)payload_m + header_m->e_shoff) + section->sh_link);
 		Elf32_Shdr *strtab = ((Elf32_Shdr*) ((uint32_t)payload_m + header_m->e_shoff) + symtab->sh_link);
 		
-		void *data = sections_data_m.find(section->sh_info)->second;
+		auto info = sections_data_m.find(section->sh_info);
+		void *data = (info != sections_data_m.end()) ? info->second : nullptr;
 		
 		if ((data==nullptr) || (section->sh_entsize == 0) || (section->sh_size == 0))
 			continue;
@@ -96,7 +97,9 @@ int16_t ElfLoader::relocate() {
 			
 			Elf32_Addr relAddr = ((Elf32_Addr) data) + rel->r_offset;
 			Elf32_Addr symAddr = rel->r_addend;
-			void* relSectionData = sections_data_m.find(sym->st_shndx)->second;
+
+			auto shndx = sections_data_m.find(sym->st_shndx);
+			void* relSectionData = (shndx != sections_data_m.end()) ? shndx->second : nullptr;
 			
 			if (relSectionData) {
 				symAddr += ((Elf32_Addr)relSectionData) + sym->st_value;  
@@ -127,6 +130,15 @@ int16_t ElfLoader::relocate() {
 	}
 	
 	return 0;
+}
+
+void* ElfLoader::operator new(size_t sz, size_t al) {
+	return heap_caps_aligned_alloc(al, sz, MALLOC_CAP_8BIT);
+}
+
+void ElfLoader::operator delete(void *ptr) {
+	//heap_caps_aligned_free(ptr); // This function is deprecated
+	heap_caps_free(ptr);
 }
 
 void ElfLoader::elfLoaderFree() {

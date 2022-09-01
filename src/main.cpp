@@ -169,21 +169,34 @@ uint8_t elfFile[] = {
 };
 
 extern "C" void del(int32_t m) {
-  TickType_t xDelay = m / portTICK_PERIOD_MS;
-  vTaskDelay(xDelay);
+	TickType_t xDelay = m / portTICK_PERIOD_MS;
+	vTaskDelay(xDelay);
 }
 
 extern "C" void app_main() {
-  ElfLoader test((void*)elfFile, {
-	{"puts", (void*) puts},
-	{"printf", (void*) printf},
-	{"del", (void*) del}
-  });
+	ElfLoader test((void*)elfFile, {
+		{"puts", (void*) puts},
+		{"printf", (void*) printf},
+		{"del", (void*) del}
+	});
+	test.parse();
+	test.relocate();
+	((void (*) ())test.getEntryPoint("local_main"))();
+/*
+	// aligned new
+	ElfLoader *test = new (32) ElfLoader((void*)elfFile, {
+		{"puts", (void*) puts},
+		{"printf", (void*) printf},
+		{"del", (void*) del}
+	});
 
-  test.parse();
-  test.relocate();
+	test->parse();
+	test->relocate();
 
-  // search entry point by name if header_m->e_entry == 0
+	// search entry point by name if header_m->e_entry == 0
   
-  ((void (*) ())test.getEntryPoint("local_main"))();
+	((void (*) ())test->getEntryPoint("local_main"))();
+
+	delete test;
+*/
 }

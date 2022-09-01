@@ -28,6 +28,9 @@ public:
 
 	~ElfLoader();
 
+	void* operator new(size_t, size_t);
+
+	void operator delete(void*);
 
 private:
 	void elfLoaderFree();
