@@ -50,12 +50,12 @@ int16_t ElfLoader::parse() {
 			if (sectHdr->sh_size) {
 				void *data = nullptr;
 				if (sectHdr->sh_flags & SHF_EXECINSTR) {
-					data = heap_caps_aligned_alloc(1 << sectHdr->sh_addralign, sectHdr->sh_size,
+					data = heap_caps_aligned_alloc(sectHdr->sh_addralign, sectHdr->sh_size,
 						MALLOC_CAP_EXEC | MALLOC_CAP_32BIT);
 					entry_point_m = (void*)((uint32_t)data + header_m->e_entry); 
 				}
 				else 
-					data = heap_caps_aligned_alloc(1 << sectHdr->sh_addralign, sectHdr->sh_size,
+					data = heap_caps_aligned_alloc(sectHdr->sh_addralign, sectHdr->sh_size,
 						MALLOC_CAP_8BIT);
 
 				if (data == nullptr) {
@@ -252,39 +252,20 @@ int16_t ElfLoader::relocateSymbol(Elf32_Addr relAddr, int32_t type, Elf32_Addr s
 }
 
 uint8_t ElfLoader::unalignedGet8(void* src) {
-	/*
-	asm volatile (
-		"EXTUI a12, %[src], 0, 2" "\n"
-		"XOR %[src], %[src], a12" "\n"
-		"L32I.N %[src], %[src], 0" "\n"
-		"SSA8L a12" "\n"
-		"SRA a12, %[src]" "\n"
-		"MOV %[src], a12" "\n"
-		: [src] "=r"(src) ::
-	);
-	return (uint8_t) src;
-	*/
-	return (*(uint32_t*)((uint32_t)src & 0xfffffffc) >> (((uint32_t)src & 0x3) * 8)) & 0xFF;
+    uint32_t w = *(uint32_t*)((uintptr_t)src & ~3);
+    return (w >> (((uintptr_t)src & 3) * 8)) & 0xFF;
 }
 
-void ElfLoader::unalignedSet8(void* dest, uint8_t value) {
-	*(uint32_t*)((uint32_t)dest & 0xfffffffc) = 
-		(*(uint32_t*)((uint32_t)dest & 0xfffffffc) & ~(0xFF << (((uint32_t)dest & 0x3) * 8))) | 
-		(value << (((uint32_t)dest & 0x3) * 8));
+void ElfLoader::unalignedSet8(void* dest, uint8_t v) {
+    uint32_t* wptr = (uint32_t*)((uintptr_t)dest & ~3);
+    uint32_t shift = ((uintptr_t)dest & 3) * 8;
+    *wptr = (*wptr & ~(0xFFu << shift)) | ((uint32_t)v << shift);
 }
 
 uint32_t ElfLoader::unalignedGet32(void* src) {
-	uint32_t res = 0;
-	asm volatile (
-	  "EXTUI %[res], %[src], 0, 2" "\n"
-	  "XOR %[src], %[src], %[res]" "\n"
-	  "L32I.N a12, %[src], 0" "\n" 
-	  "L32I.N %[src], %[src], 4" "\n"
-	  "SSA8L %[res]" "\n"
-	  "SRC %[res], %[src], a12" "\n" 
-	  : [res] "=r"(res), [src]"=r"(src) : "[src]" (src) :
-	);
-	return res;
+    uint32_t val;
+    memcpy(&val, src, sizeof(val));
+    return val;
 }
 
 void ElfLoader::unalignedSet32(void* dest, uint32_t value) {
@@ -296,6 +277,7 @@ void ElfLoader::unalignedCpy(void* dest, void* src, size_t n) {
 	for(; n > 0; n--, ((int8_t*&)dest)++, ((int8_t*&)src)++)
 		unalignedSet8(dest, unalignedGet8(src));
 }
+
 
 ElfLoader::~ElfLoader() {
 	elfLoaderFree();

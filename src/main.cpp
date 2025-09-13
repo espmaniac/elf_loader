@@ -179,9 +179,16 @@ extern "C" void app_main() {
 		{"printf", (void*) printf},
 		{"del", (void*) del}
 	});
-	test.parse();
-	test.relocate();
-	((void (*) ())test.getEntryPoint("local_main"))();
+	if (test.parse() == 0) {
+		if(test.relocate() == 0)
+			((void (*) ())test.getEntryPoint("local_main"))();
+		else {
+			printf("\nELF RELOCATE ERROR\n");
+		}
+	} else {
+		printf("\nELF PARSE ERROR\n");
+	}
+
 /*
 	// aligned new
 	ElfLoader *test = new (32) ElfLoader((void*)elfFile, {
@@ -190,13 +197,19 @@ extern "C" void app_main() {
 		{"del", (void*) del}
 	});
 
-	test->parse();
-	test->relocate();
-
+	if (test->parse() == 0) {
+		if(test->relocate() == 0)
+			((void (*) ())test.getEntryPoint("local_main"))();
+		else {
+			printf("\nELF RELOCATE ERROR\n");
+		}
+	} else {
+		printf("\nELF PARSE ERROR\n");
+	}
 	// search entry point by name if header_m->e_entry == 0
   
-	((void (*) ())test->getEntryPoint("local_main"))();
+
 
 	delete test;
-*/
+	*/
 }
