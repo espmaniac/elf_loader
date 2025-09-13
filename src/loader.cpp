@@ -52,7 +52,8 @@ int16_t ElfLoader::parse() {
 				if (sectHdr->sh_flags & SHF_EXECINSTR) {
 					data = heap_caps_aligned_alloc(sectHdr->sh_addralign, sectHdr->sh_size,
 						MALLOC_CAP_EXEC | MALLOC_CAP_32BIT);
-					entry_point_m = (void*)((uint32_t)data + header_m->e_entry); 
+					if (entry_point_m == nullptr)
+						entry_point_m = (void*)((uint32_t)data + header_m->e_entry); 
 				}
 				else 
 					data = heap_caps_aligned_alloc(sectHdr->sh_addralign, sectHdr->sh_size,
