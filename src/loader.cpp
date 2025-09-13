@@ -246,6 +246,11 @@ int16_t ElfLoader::relocateSymbol(Elf32_Addr relAddr, int32_t type, Elf32_Addr s
 			//break;
 		}
 
+		case R_XTENSA_PLT: {
+    		unalignedSet32((void*)relAddr, symAddr);
+			break;
+		}
+
 		default:
 			return -1;
 	}
@@ -282,4 +287,5 @@ void ElfLoader::unalignedCpy(void* dest, void* src, size_t n) {
 
 ElfLoader::~ElfLoader() {
 	elfLoaderFree();
+
 }
